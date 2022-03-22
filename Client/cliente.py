@@ -6,7 +6,9 @@ import secrets
 
 from sys import argv
 
-uploadSpeed = 8
+from utilityFunctions import updateJSON, loadJSON, verifyConfig
+
+uploadSpeed = 1024**2
 
 class CLDrive():
     
@@ -17,20 +19,15 @@ class CLDrive():
     def createConfig(self, user):
         identifier = '{}{}'.format(user, secrets.token_urlsafe(16)).encode('utf-8')
         identifier = sha1(identifier).hexdigest()
-        
         config = {
             "user": user,
             "identifier":identifier,
         }
-        
         self.config = config
-        
-        with open('config.json', 'w') as f:
-            json.dump(config, f, indent=4)
+        updateJSON('config.json', config)
             
     def loadConfig(self):
-        with open('config.json') as f:
-            self.config = json.load(f)
+        self.config = loadJSON('config.json')
             
     def upload(self, fileName):
         self.s.connect('tcp://localhost:8001')
@@ -81,6 +78,10 @@ class CLDrive():
             
             response = self.s.recv_multipart()
             
+            if response[0].decode('utf-8') == 'error':
+                print(response[1].decode('utf-8'))
+                break
+            
             pointerState = response[0]
             data = response[1]
             
@@ -92,9 +93,17 @@ class CLDrive():
         
  
 Client = CLDrive()
-if argv[1] == 'u':
-    Client.upload(argv[2])
-elif argv[1] == 'd':
-    Client.download(argv[2])
-elif argv[1] == 'c':
-    Client.createConfig(argv[2])
+if verifyConfig():
+    if argv[1] == 'u':
+        Client.upload(argv[2])
+    elif argv[1] == 'd':
+        Client.download(argv[2])
+        
+else:
+    print('''
+          Este cliente aun no
+          tiene configuracion inicial
+          por favor ingrese su nombre
+          de usuario: ''')
+    user = input('          ')
+    Client.createConfig(user)
