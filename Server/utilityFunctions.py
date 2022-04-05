@@ -6,7 +6,7 @@ def getPaths(mainDir, id, fileName):
     return (dirPath, filePath)
 
 def decodeMessage(message):
-    return (val.decode("utf-8") for val in message[:3]) #accion, id, fileName
+    return (val.decode("utf-8") for val in message[1:3]) #accion, id, fileName
 
 def decodeParams(message):
     messageSlice = message[3:]

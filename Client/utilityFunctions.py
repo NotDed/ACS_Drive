@@ -1,6 +1,14 @@
 import json
 import os
 
+from math import ceil
+
+def requiredParts(path, partSize = 1024):
+  with open(path, 'rb')as f:
+    f.seek(0,2)
+    size = f.tell()
+  return ceil(size/partSize)
+
 def verifyConfig():
     return os.path.exists('config.json')
 

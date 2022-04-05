@@ -2,6 +2,7 @@ import zmq
 import os
 
 from utilityFunctions import getPartitions
+from secrets import token_urlsafe
 
 class PROXDrive():
     
@@ -10,8 +11,12 @@ class PROXDrive():
         self.s = self.context.socket(zmq.REP)
         self.s.bind('tcp://*:8001')
         
+        self.serverConn = self.context.socket(zmq.REQ)
+        
         self.servers = {}
         self.filePartitions = {}
+        self.links = {}
+        
         
     def addServer(self, ip, storage):
         if not ip in self.servers.keys():
@@ -47,6 +52,31 @@ class PROXDrive():
             
         self.s.send_json(response)
         
+    def generateLink(self, id, fileName):
+        fileLogisticId = '{}{}'.format(id, fileName)
+        newUrl = token_urlsafe(16)
+        
+        print(fileLogisticId)
+        
+        if fileLogisticId in self.filePartitions.keys():
+            self.links[newUrl] = (id, fileName)
+            response = ['exito', newUrl]
+        else:
+            response = ['error', 'algo salio mal']
+            
+        self.s.send_json(response)
+        if response[0] == 'exito':
+            self.broadCastToServers([newUrl, id, fileName])
+        
+    def broadCastToServers(self, urlPacket):
+        message = ['al']
+        message.extend(urlPacket)
+        message = [i.encode('utf8') for i in message]
+        for ip in self.servers.keys():
+            self.serverConn.connect(ip)
+            self.serverConn.send_multipart(message)
+            response = self.serverConn.recv_multipart()
+            self.serverConn.disconnect(ip)
         
     def waitForActions(self):
         while True:
@@ -70,7 +100,20 @@ class PROXDrive():
             if accion == 'd':
                 id = message['id']
                 fileName = message['fileName']
-                self.uploadLogistic(id, fileName, partCount)
+                self.downloadLogistic(id, fileName)
+                
+            if accion == 'gl':
+                id = message['id']
+                fileName = message['fileName']
+                self.generateLink(id, fileName)
+                
+            elif accion == 'dl':
+                url = message['link']
+                id, filename = self.links[url]
+                self.downloadLogistic(id, fileName)
+                
+                
+                
         
         
 proxy = PROXDrive()

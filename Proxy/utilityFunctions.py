@@ -71,6 +71,14 @@ def verifyParitions(svs, partitions):
       return False
   return True
 
+def sortPartitions(partitions):
+  sortedTuples = sorted(partitions.items(), key = lambda x: x[1][1])
+  sortedPartitions = {}
+  for i in sortedTuples:
+    sortedPartitions[i[0]] = i[1] 
+
+  return sortedPartitions
+
 def getPartitions(svs, parts):
   balancedPartitions = {}
   if checkStorage(svs, parts):
@@ -81,5 +89,6 @@ def getPartitions(svs, parts):
       return {}
 
   balancedPartitions = indexPartitions(balancedPartitions)
+  # balancedPartitions = sortPartitions(balancedPartitions)
   
   return balancedPartitions
