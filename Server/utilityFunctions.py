@@ -1,23 +1,25 @@
-import os
+from secrets import token_urlsafe
+from hashlib import sha1
 
-def getPaths(mainDir, id, fileName):
-    dirPath = '{}/{}'.format(mainDir, id)
-    filePath = '{}/{}/{}'.format(mainDir, id, fileName)
-    return (dirPath, filePath)
+from json import dumps, loads
+
+def getNewToken():
+  token = sha1(token_urlsafe(100).encode()).hexdigest()[:2]
+  return token, int(token, 16)
+
+# def encodeMessage(message):
+#   return [str(part).encode('utf-8') for part in message]
+
+# def decodeMessage(message):
+#   return [part.decode('utf-8') for part in message]
+
+def encodeMessage(message):
+    return [dumps(part).encode('utf-8') for part in message]
 
 def decodeMessage(message):
-    return (val.decode("utf-8") for val in message[1:3]) #accion, id, fileName
+    return [loads(part.decode('utf-8')) for part in message]
 
-def decodeParams(message):
-    messageSlice = message[3:]
-    if len(messageSlice) > 1:
-        return (messageSlice[0].decode("utf-8"), messageSlice[1])
-    else:
-        return int(messageSlice[0].decode('utf-8'))
-    
-def makeOrVerify(dirPath, make=False):
-    if not os.path.exists(dirPath):
-        if make:
-            os.makedirs(dirPath)
-        return False
-    return True
+def getListFromStr(lstr):
+  lst = lstr.replace('[','').replace(']','').replace(' ','').split(',')
+  lst = [int(element) for element in lst]
+  return lst
