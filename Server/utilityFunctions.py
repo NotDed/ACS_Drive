@@ -3,8 +3,11 @@ from hashlib import sha1
 
 from json import dumps, loads
 
-def getNewToken():
-  token = sha1(token_urlsafe(100).encode()).hexdigest()[:2]
+def getNewToken(tk):
+  if tk is None:
+    token = sha1(token_urlsafe(100).encode()).hexdigest()
+  else:
+    token = tk
   return token, int(token, 16)
 
 # def encodeMessage(message):
