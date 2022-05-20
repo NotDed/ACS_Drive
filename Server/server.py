@@ -7,7 +7,7 @@ import os
 
 import json
 
-from utilityFunctions import getNewToken, encodeMessage, decodeMessage, getListFromStr
+from utilityFunctions import getNewToken, encodeMessage, decodeMessage
 
 # downloadSpeed = (1024**2)*10 #10 megabytes
 

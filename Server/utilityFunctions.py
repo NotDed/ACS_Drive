@@ -21,8 +21,3 @@ def encodeMessage(message):
 
 def decodeMessage(message):
     return [loads(part.decode('utf-8')) for part in message]
-
-def getListFromStr(lstr):
-  lst = lstr.replace('[','').replace(']','').replace(' ','').split(',')
-  lst = [int(element) for element in lst]
-  return lst
