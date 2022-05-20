@@ -50,6 +50,8 @@ class CLDrive():
         with open(fileName, mode='w'):
             pass
         
+        
+        completeFileHash = sha1()
         for partTk in torrentDict['parts']:
             
             print('{} \t<- looking for'.format(partTk))
@@ -63,13 +65,19 @@ class CLDrive():
                 if response[0] == b'"accepted"':
                     print('{} \t<- found'.format(partTk))
                     part = response[1]
+                    completeFileHash.update(part)
                     accepted = True
                     with open(fileName, 'ab') as f:
                         f.write(part)
                 else:
                     response = decodeMessage(response)
                     actualIp = response[1]
-        
+                    
+        completeFileHash = completeFileHash.hexdigest()
+        if torrentDict['completeFileHash'] == completeFileHash:
+            print("Descarga exitosa")
+        else:
+            print("Algo salió mal en la descarga")
         
     def upload(self, ringIp, fileName):
         actualIp = ringIp

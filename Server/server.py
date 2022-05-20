@@ -283,9 +283,8 @@ class SVDrive():
         end = False
         while not end:
             self.verifyArchives()
-            # print(self.getServerInfo())
+            print(self.getServerInfo())
             accion, message = self.waitMessage()
-            print(accion)
             response = []
             if accion == 'shutDown':
                 response, end = self.endServer()
