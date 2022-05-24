@@ -316,14 +316,15 @@ puerto = argv[1]
 accion = argv[2]
 
 sv = SVDrive('localhost', puerto)
-sv.makeStorageDir()
 
 if accion == 'waitActions':
+    sv.makeStorageDir()
     sv.waitForActions()
 if accion == 'walk':
     ip = argv[3]
     sv.walkRing(ip)
 if accion == 'attach':
     ip = argv[3]
+    sv.makeStorageDir()
     sv.attachToRing(ip)
     sv.waitForActions()
